@@ -61,8 +61,6 @@ resource "aws_route_table_association" "public_route_association2" {
   route_table_id = aws_route_table.public_route.id
 }
 
-
-
 resource "aws_route_table_association" "private_route_association1" {
   subnet_id      = aws_subnet.private_subnet1.id
   route_table_id = aws_route_table.private_route.id
@@ -73,23 +71,15 @@ resource "aws_route_table_association" "private_route_association2" {
   route_table_id = aws_route_table.private_route.id
 }
 
-
-
-
-
-
-
 resource "aws_eip" "my_eip" {
   domain = "vpc"
   tags = { Name = "My_Elastic_IP"
   }
 }
 
-
-
 resource "aws_nat_gateway" "My_NAT_GW" {
- allocation_id    = aws_eip.my_eip.id
-  subnet_id = aws_subnet.public_subnet1.id
+  allocation_id = aws_eip.my_eip.id
+  subnet_id     = aws_subnet.public_subnet1.id
   tags = { Name = "My_NAT_GATEWAY"
   }
 }
@@ -105,7 +95,7 @@ resource "aws_route" "public_route" {
 resource "aws_route" "private_route" {
   destination_cidr_block = "0.0.0.0/0"
   route_table_id         = aws_route_table.private_route.id
- nat_gateway_id             = aws_nat_gateway.My_NAT_GW.id
+  nat_gateway_id         = aws_nat_gateway.My_NAT_GW.id
 }
 
 
@@ -148,31 +138,9 @@ resource "aws_security_group" "aws_sg" {
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+resource "aws_instance" "instance_Creation" {
+  instance_type = var.aws_instance_type
+  ami           = var.aws_ami
+  tags = { Name = "My_Project_Server"
+  }
+}
