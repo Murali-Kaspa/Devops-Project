@@ -23,3 +23,13 @@ variable "aws_sub_pri2" {
   description = "CIDR for Private_Subnet2"
 }
 
+
+variable "aws_instance_type" {
+  default     = "t2.micro"
+  description = "Instance Type i used for this project"
+}
+
+variable "aws_ami" {
+  default     = "ami-01816d07b1128cd2d"
+  description = "Instance Image"
+}
