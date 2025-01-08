@@ -9,16 +9,18 @@ resource "aws_vpc" "my_vpc" {
 }
 
 resource "aws_subnet" "public_subnet1" {
-  vpc_id     = aws_vpc.my_vpc.id
-  cidr_block = var.aws_sub_pub1
+  vpc_id                  = aws_vpc.my_vpc.id
+  cidr_block              = var.aws_sub_pub1
+  map_public_ip_on_launch = true
   tags = { Name = "My_public_subnet-1"
   }
 }
 
 
 resource "aws_subnet" "public_subnet2" {
-  vpc_id     = aws_vpc.my_vpc.id
-  cidr_block = var.aws_sub_pub2
+  vpc_id                  = aws_vpc.my_vpc.id
+  cidr_block              = var.aws_sub_pub2
+  map_public_ip_on_launch = true
   tags = { Name = "My_public_subnet-2"
   }
 }
@@ -129,6 +131,16 @@ resource "aws_security_group" "aws_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    description = "Allow Jenkins to launch on website"
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+
+
   egress {
     description = "Allow all outbound traffic"
     from_port   = 0
@@ -139,8 +151,26 @@ resource "aws_security_group" "aws_sg" {
 }
 
 resource "aws_instance" "instance_Creation" {
-  instance_type = var.aws_instance_type
-  ami           = var.aws_ami
+  instance_type               = var.aws_instance_type
+  ami                         = var.aws_ami
+  subnet_id                   = aws_subnet.public_subnet1.id
+  key_name                    = aws_key_pair.my_key_pair.key_name
+  associate_public_ip_address = true
   tags = { Name = "My_Project_Server"
   }
+}
+
+resource "tls_private_key" "my_key" {
+  algorithm = "RSA"
+  rsa_bits  = 2048
+}
+
+resource "aws_key_pair" "my_key_pair" {
+  key_name   = "my_key_pair_from_terraform"
+  public_key = tls_private_key.my_key.public_key_openssh
+}
+
+output "private_key_pem" {
+  value     = tls_private_key.my_key.private_key_pem
+  sensitive = true
 }
